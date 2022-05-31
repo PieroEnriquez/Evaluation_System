@@ -1,5 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+pragma experimental ABIEncoderV2;
 
 contract evaluation{
     //Teacher's address so everyone are able to see it
@@ -13,51 +14,51 @@ contract evaluation{
     //Mapping to relate student's ID's hash with their grades
     mapping(bytes32=>uint) grades;
 
-    //Array de alumnos que piden revisiones de examen
-    string[] revisiones;
+    //Array for students who ask for a revision on their evaluation
+    string[] revisions;
 
-    //Eventos
-    event alumno_evaluado(bytes32);
-    event evento_revision(string);
+    //Events
+    event evaluated_student(bytes32);
+    event revision_event(string);
 
-    //Modificador para que solo ejecute el profesor
-    modifier soloProfesor(address _address){
-        require(_address == teacher, "No tienes permiso para ejecutar esta funcion");
+    //Modifier for only the teacher can run a command
+    modifier onlyTeacher(address _address){
+        require(_address == teacher, "You have no permission to run this command");
         _;
     }
 
-    //Funcion en la que se publican las notas
-    function publicarNotas(string memory _idAlumno, uint _nota) public soloProfesor(msg.sender){
-        //Hash del ID del alumno
-        bytes32 _hashIDAlumno = keccak256(abi.encodePacked(_idAlumno));
+    //Function to publish students' grades
+    function publishGrades(string memory _idStudent, uint _grade) public onlyTeacher(msg.sender){
+        //Calculating the hash of the students' ID
+        bytes32 _hashIDStudent = keccak256(abi.encodePacked(_idStudent));
 
-        //Relacionar el hash del ID del alumno con su nota
-        grades[_hashIDAlumno] = _nota;
+        //Relating students' ID's hash with their grades
+        grades[_hashIDStudent] = _grade;
 
-        //Emitir un evento
-        emit alumno_evaluado(_hashIDAlumno);
+        //Emiting the event
+        emit evaluated_student(_hashIDStudent);
     }
 
-    //Funcion para ver las notas de un alumno
-    function verNotas(string memory _idAlumno) public view returns(uint){
-        //Hash del ID del alumno
-        bytes32 _hashIDAlumno = keccak256(abi.encodePacked(_idAlumno));
-        //Nota asociada al ID del alumno
-        uint nota_alumno = grades[_hashIDAlumno];
-        //Visualizar la nota
-        return nota_alumno;
+    //Function to see an students' grades
+    function myGrades(string memory _idStudent) public view returns(uint){
+        //Calculating the hash of the students' ID
+        bytes32 _hashIDAlumno = keccak256(abi.encodePacked(_idStudent));
+        //Grade relate to students' ID's hash
+        uint student_grade = grades[_hashIDAlumno];
+        //Returning the students' grade
+        return student_grade;
     }
 
-    //Funcion que permita pedir una revision del examen
-    function Revision(string memory _idAlumno) public{
-        //Almacenamiento de la identidad de un alumno en un array
-        revisiones.push(_idAlumno);
-        //Emision del evento
-        emit evento_revision(_idAlumno);
+    //Function that allows an student to ask for a revision
+    function Revision(string memory _idStudent) public{
+        //Saving students' ID in the revisions array
+        revisions.push(_idStudent);
+        //Emiting the event
+        emit revision_event(_idStudent);
     }
 
-    //Funcion que permita ver las revisiones
-    function verRevisiones() public view soloProfesor(msg.sender) returns(string[]memory){
-        return revisiones;
+    //Function for the teahcer in order to see which students want a revision
+    function seeRevisions() public view onlyTeacher(msg.sender) returns(string[]memory){
+        return revisions;
     }
 }
