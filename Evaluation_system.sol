@@ -2,15 +2,16 @@
 pragma solidity ^0.8.0;
 
 contract evaluation{
-    //Direccion del profesor
-    address public profesor;
+    //Teacher's address so everyone are able to see it
+    address public teacher;
 
+    //Set the teacher's address as the one that deploy the contract
     constructor(){
-        profesor = msg.sender;
+        teacher = msg.sender;
     }
 
-    //Mapping para relacionar el hash del ID del almuno con su nota del examen
-    mapping(bytes32=>uint) notas;
+    //Mapping to relate student's ID's hash with their grades
+    mapping(bytes32=>uint) grades;
 
     //Array de alumnos que piden revisiones de examen
     string[] revisiones;
@@ -20,8 +21,8 @@ contract evaluation{
     event evento_revision(string);
 
     //Modificador para que solo ejecute el profesor
-    modifier soloProfesor(address _direccion){
-        require(_direccion == profesor, "No tienes permiso para ejecutar esta funcion");
+    modifier soloProfesor(address _address){
+        require(_address == teacher, "No tienes permiso para ejecutar esta funcion");
         _;
     }
 
@@ -31,7 +32,7 @@ contract evaluation{
         bytes32 _hashIDAlumno = keccak256(abi.encodePacked(_idAlumno));
 
         //Relacionar el hash del ID del alumno con su nota
-        notas[_hashIDAlumno] = _nota;
+        grades[_hashIDAlumno] = _nota;
 
         //Emitir un evento
         emit alumno_evaluado(_hashIDAlumno);
@@ -42,7 +43,7 @@ contract evaluation{
         //Hash del ID del alumno
         bytes32 _hashIDAlumno = keccak256(abi.encodePacked(_idAlumno));
         //Nota asociada al ID del alumno
-        uint nota_alumno = notas[_hashIDAlumno];
+        uint nota_alumno = grades[_hashIDAlumno];
         //Visualizar la nota
         return nota_alumno;
     }
