@@ -11,7 +11,7 @@ contract evaluation{
         teacher = msg.sender;
     }
 
-    //Mapping to relate student's ID's hash with their grades
+    //Mapping to relate students' ID's hash with their grades
     mapping(bytes32=>uint) grades;
 
     //Array for students who ask for a revision on their evaluation
